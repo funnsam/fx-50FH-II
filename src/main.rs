@@ -1,3 +1,6 @@
+#![feature(int_roundings)]
+#![allow(invalid_reference_casting)]
+
 use std::{io::{Write, stdout}, time::*};
 use crossterm::{*, style::{Color, Stylize}, event::*};
 
@@ -6,14 +9,21 @@ use calculator::Calculator;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut stdout = stdout();
-    execute!(stdout, terminal::EnterAlternateScreen, terminal::Clear(terminal::ClearType::All), cursor::MoveTo(0, 0))?;
+    execute!(
+        stdout,
+        terminal::EnterAlternateScreen,
+        event::PushKeyboardEnhancementFlags(
+            KeyboardEnhancementFlags::DISAMBIGUATE_ESCAPE_CODES
+        ),
+        terminal::Clear(terminal::ClearType::All),
+        cursor::MoveTo(0, 0)
+    )?;
     terminal::enable_raw_mode()?;
 
     queue!(stdout, style::PrintStyledContent(
-        "Virtual fx-50FH II"
+        "Virtual fx-50FH II    BSD-2-Patent"
             .italic()
-            .with(Color::Black)
-            .on(Color::Grey)
+            .with(Color::DarkGrey)
     ))?;
 
     stdout.flush()?;
@@ -50,7 +60,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             cursor::MoveTo(0, 4),
             style::PrintStyledContent(
                 bot .bold()
-                    .with(Color::White)
+                    .with(Color::Blue)
             ),
         )?;
 
@@ -58,12 +68,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Some((x, false)) => queue!(
                 stdout,
 
+                cursor::Show,
                 cursor::MoveTo(x as u16 + 1, 3),
                 cursor::SetCursorStyle::BlinkingBar,
             )?,
             Some((x, true)) => queue!(
                 stdout,
 
+                cursor::Show,
                 cursor::MoveTo(x as u16 + 1, 3),
                 cursor::SetCursorStyle::BlinkingUnderScore,
             )?,
@@ -74,6 +86,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     
     terminal::disable_raw_mode()?;
-    execute!(stdout, terminal::LeaveAlternateScreen, cursor::Show, cursor::SetCursorStyle::DefaultUserShape)?;
+    execute!(
+        stdout,
+        terminal::LeaveAlternateScreen,
+        event::PopKeyboardEnhancementFlags,
+        cursor::Show,
+        cursor::SetCursorStyle::DefaultUserShape
+    )?;
     Ok(())
 }
