@@ -30,7 +30,7 @@ ENG 		i
 M+ 			]
 9 			\ OR Numpad 9
 
-ab/c 		a
+ab/ca
 sqrt 		s
 x² 			d
 ^ 			f
