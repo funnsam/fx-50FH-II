@@ -32,11 +32,23 @@ impl Calculator {
         }
     }
 
+    pub fn on_key_event(&mut self, ke: crossterm::event::KeyEvent) {
+        use crossterm::event::*;
+        match ke {
+            KeyEvent { code: KeyCode::Char('4'), kind: KeyEventKind::Press, state: KeyEventState::NONE, .. } => self.toggle_menu(),
+            _ => (),
+        }
+    }
+
     pub fn tick(&mut self) {
+    }
+
+    pub fn toggle_menu(&mut self) {
         self.menu = match self.menu {
             None => Some((Menu::ModeSelect, 0)),
             Some((Menu::ModeSelect, 0)) => Some((Menu::ModeSelect, 1)),
-            _ => None
+            Some((Menu::ModeSelect, 1)) => None,
+            _ => return,
         }
     }
 
@@ -46,8 +58,9 @@ impl Calculator {
         let mut bot = String::new();
 
         stat += &format!(
-         // "SAhMSR{} r∠θR⇔I",
-            "      {}       ",
+         // "SAhMSR CMPLX_SDREGPROG
+         //            r∠θR⇔I",
+            "       {}       ",
             self.mode.status_name()
         );
 

@@ -23,11 +23,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         if poll(Duration::from_millis(100))? {
             match read()? {
                 Event::Key(KeyEvent { code: KeyCode::Esc, kind: KeyEventKind::Press, .. }) => break 'main_loop,
+                Event::Key(ke) => calc.on_key_event(ke),
                 _ => ()
             }
         }
 
-        // calc.tick();
+        calc.tick();
 
         let (stat, top, bot) = calc.get_display();
         queue!(
