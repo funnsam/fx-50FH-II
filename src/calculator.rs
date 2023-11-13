@@ -65,10 +65,10 @@ impl Calculator {
         use crossterm::event::*;
 
         macro_rules! key_map {
-            ($($($state: ident $og: pat_param)|+ => $k: expr), * $(,)?) => {
+            ($($($state: pat_param, $og: pat_param)|+ => $k: expr), * $(,)?) => {
                 match ke {
                     $(
-                        $(Some(KeyEvent { code: $og, kind: KeyEventKind::Press, state: KeyEventState::$state, .. }))|+ => {
+                        $(Some(KeyEvent { code: $og, kind: KeyEventKind::Press, state: $state, .. }))|+ => {
                             self.pending_key = Some($k)
                         },
                     )*
@@ -78,59 +78,60 @@ impl Calculator {
         }
 
         key_map!(
-            NONE KeyCode::Char('`') => Key::Shift,
-            NONE KeyCode::Char('0') | KEYPAD KeyCode::Char('0') => Key::_0,
-            NONE KeyCode::Char('1') | KEYPAD KeyCode::Char('1') => Key::_1,
-            NONE KeyCode::Char('2') | KEYPAD KeyCode::Char('2') => Key::_2,
-            NONE KeyCode::Char('3') | KEYPAD KeyCode::Char('3') => Key::_3,
-            NONE KeyCode::Char('4') | KEYPAD KeyCode::Char('4') => Key::_4,
-            NONE KeyCode::Char('5') | KEYPAD KeyCode::Char('5') => Key::_5,
-            NONE KeyCode::Char('6') | KEYPAD KeyCode::Char('6') => Key::_6,
-            NONE KeyCode::Char('7') | KEYPAD KeyCode::Char('7') => Key::_7,
-            NONE KeyCode::Char('8') | KEYPAD KeyCode::Char('8') => Key::_8,
-            NONE KeyCode::Char('9') | KEYPAD KeyCode::Char('9') => Key::_9,
-            NONE KeyCode::Char('-') => Key::Alpha,
+            _, KeyCode::Char('l')  | KeyEventState::KEYPAD, KeyCode::Char('+') => Key::Add,
+            _, KeyCode::Char(';')  | KeyEventState::KEYPAD, KeyCode::Char('-') => Key::Subtract,
+            _, KeyCode::Char('\'') | KeyEventState::KEYPAD, KeyCode::Char('*') => Key::Multiply,
 
-            NONE KeyCode::Char('q') => Key::Prog,
-            NONE KeyCode::Char('w') => Key::Fmla,
-            NONE KeyCode::Char('t') => Key::PowNegOne,
-            NONE KeyCode::Char('y') => Key::Cubed,
-            NONE KeyCode::Char('u') => Key::Rcl,
-            NONE KeyCode::Char('i') => Key::Eng,
-            NONE KeyCode::Char('o') => Key::BracketStart,
-            NONE KeyCode::Char('p') => Key::BracketEnd,
-            NONE KeyCode::Char('[') => Key::Comma,
-            NONE KeyCode::Char(']') => Key::MPlus,
-            NONE KeyCode::Char('\\') => Key::Mode,
+            _, KeyCode::Char('`') => Key::Shift,
+            _, KeyCode::Char('0') => Key::_0,
+            _, KeyCode::Char('1') => Key::_1,
+            _, KeyCode::Char('2') => Key::_2,
+            _, KeyCode::Char('3') => Key::_3,
+            _, KeyCode::Char('4') => Key::_4,
+            _, KeyCode::Char('5') => Key::_5,
+            _, KeyCode::Char('6') => Key::_6,
+            _, KeyCode::Char('7') => Key::_7,
+            _, KeyCode::Char('8') => Key::_8,
+            _, KeyCode::Char('9') => Key::_9,
+            _, KeyCode::Char('-') => Key::Alpha,
+            _, KeyCode::Enter     => Key::Exe,
+            _, KeyCode::Backspace => Key::Del,
 
-            NONE KeyCode::Char('a') => Key::Fraction,
-            NONE KeyCode::Char('s') => Key::SquareRoot,
-            NONE KeyCode::Char('d') => Key::Squared,
-            NONE KeyCode::Char('f') => Key::Power,
-            NONE KeyCode::Char('g') => Key::Log,
-            NONE KeyCode::Char('h') => Key::Ln,
-            NONE KeyCode::Char('j') | KEYPAD KeyCode::Backspace => Key::Del,
-            NONE KeyCode::Char('k') => Key::Ac,
-            NONE KeyCode::Char('l') => Key::Add,
-            NONE KeyCode::Char(';') => Key::Subtract,
-            NONE KeyCode::Char('\'') => Key::Multiply,
-            NONE KeyCode::Enter | KEYPAD KeyCode::Char('/') => Key::Divide,
+            _, KeyCode::Char('q') => Key::Prog,
+            _, KeyCode::Char('w') => Key::Fmla,
+            _, KeyCode::Char('t') => Key::PowNegOne,
+            _, KeyCode::Char('y') => Key::Cubed,
+            _, KeyCode::Char('u') => Key::Rcl,
+            _, KeyCode::Char('i') => Key::Eng,
+            _, KeyCode::Char('o') => Key::BracketStart,
+            _, KeyCode::Char('p') => Key::BracketEnd,
+            _, KeyCode::Char('[') => Key::Comma,
+            _, KeyCode::Char(']') => Key::MPlus,
+            _, KeyCode::Char('\\') => Key::Mode,
 
-            NONE KeyCode::Char('z') => Key::Negative,
-            NONE KeyCode::Char('x') => Key::Base60,
-            NONE KeyCode::Char('c') => Key::Hyp,
-            NONE KeyCode::Char('v') => Key::Sin,
-            NONE KeyCode::Char('b') => Key::Cos,
-            NONE KeyCode::Char('n') => Key::Tan,
-            NONE KeyCode::Char('m') | KEYPAD KeyCode::Char('.') => Key::Dot,
-            NONE KeyCode::Char(',') => Key::Exp,
-            NONE KeyCode::Char('.') => Key::Ans,
-            NONE KeyCode::Char('/') => Key::Exe,
+            _, KeyCode::Char('a') => Key::Fraction,
+            _, KeyCode::Char('s') => Key::SquareRoot,
+            _, KeyCode::Char('d') => Key::Squared,
+            _, KeyCode::Char('f') => Key::Power,
+            _, KeyCode::Char('g') => Key::Log,
+            _, KeyCode::Char('h') => Key::Ln,
+            _, KeyCode::Char('k') => Key::Ac,
 
-            NONE KeyCode::Left  => Key::Left,
-            NONE KeyCode::Down  => Key::Down,
-            NONE KeyCode::Up    => Key::Up,
-            NONE KeyCode::Right => Key::Right,
+            _, KeyCode::Char('z') => Key::Negative,
+            _, KeyCode::Char('x') => Key::Base60,
+            _, KeyCode::Char('c') => Key::Hyp,
+            _, KeyCode::Char('v') => Key::Sin,
+            _, KeyCode::Char('b') => Key::Cos,
+            _, KeyCode::Char('n') => Key::Tan,
+            _, KeyCode::Char('m') => Key::Ans,
+            _, KeyCode::Char(',') => Key::Exp,
+            _, KeyCode::Char('.') => Key::Dot,
+            _, KeyCode::Char('/') => Key::Divide,
+
+            _, KeyCode::Left  => Key::Left,
+            _, KeyCode::Down  => Key::Down,
+            _, KeyCode::Up    => Key::Up,
+            _, KeyCode::Right => Key::Right,
         );
     }
 
@@ -282,7 +283,7 @@ impl Menu {
             (Menu::ModeSelect, _, Key::_4) => calc.mode = Mode::SingleStat,
             (Menu::ModeSelect, _, Key::_5) => calc.mode = Mode::PairedStat,
             (Menu::ModeSelect, _, Key::_6) => calc.mode = Mode::Program,
-            _ => (),
+            _ => return,
         }
 
         calc.menu = None;

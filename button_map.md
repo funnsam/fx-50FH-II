@@ -2,17 +2,18 @@ pls dont blame me on this horrible layout
 
 ```
 SHIFT 		`
-0 			0 OR Numpad 0
-1 			1 OR Numpad 1
-2 			2 OR Numpad 2
-3 			3 OR Numpad 3
-4 			4 OR Numpad 4
-5 			5 OR Numpad 5
-6 			6 OR Numpad 6
-7 			7 OR Numpad 7
-8 			8 OR Numpad 8
-9 			9 OR Numpad 9
+0 			0
+1 			1
+2 			2
+3 			3
+4 			4
+5 			5
+6 			6
+7 			7
+8 			8
+9 			9
 ALPHA 		-
+DEL  		Backspace
 
 Prog 		q
 FMLA 		w
@@ -32,12 +33,11 @@ x² 			d
 ^ 			f
 log 		g
 ln 			h
-DEL  		j OR Numpad backspace
 AC 			k
 + 			l OR Numpad +
 - 			; OR Numpad -
-× 			' OR Numpad ×
-÷ 			Enter OR Numpad ÷
+× 			' OR Numpad *
+EXE 		Enter
 
 (-) 		z
 °'"  		x
@@ -45,21 +45,30 @@ hyp 		c
 sin 		v
 cos 		b
 tan 		n
-. 			m OR Numpad .
+Ans 		m
 EXP 		,
-Ans 		.
-EXE 		/ OR Numpad enter
+. 			.
+÷ 			/
 
 Up 			↑
-Right 		→
 Left 		←
 Down 		↓
+Right 		→
 ```
 
 QWERTY Keyboard layout
 ```
-SHIF _0__ _1__ _2__ _3__ _4__ _5__ _6__ _7__ _8__ _9__ ALPH ____ ____
-__ Prog FMLA _←__ _↓__ x-¹_ _x³_ RCL_ ENG_ _(__ _)__ _,__ _M+_ MODE
-_____ ab/c sqrt _x²_ _^__ log_ _ln_ DEL_ _AC_ _+__ _-__ _×__ __÷__
-_______  (-)_ °'" hyp_ sin_ cos_ tan_ _.__ EXP_ Ans_ EXE_ _______
+SHIF _1__ _2__ _3__ _4__ _5__ _6__ _7__ _8__ _9__ _0__ ALPH ____ DEL_
+____ Prog FMLA _←__ _↓__ x-¹_ _x³_ RCL_ ENG_ _(__ _)__ _,__ _M+_ MODE
+______ ab/c sqrt _x²_ _^__ log_ _ln_ ____ _AC_ _+__ _-__ _×__ __EXE__       _↑__
+_________  (-)_ °'" hyp_ sin_ cos_ tan_ _.__ EXP_ Ans_ _÷__ _________  _←__ _↓__ _→__
+```
+
+Numpad (Numlock on)
+```
+____ _÷__ _×__ _-__
+_9__ _8__ _7__ _+__
+_6__ _5__ _4__ _+__
+_3__ _2__ _1__ EXE_
+____0____ _.__ EXE_
 ```
