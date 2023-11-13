@@ -44,7 +44,7 @@ enum Key {
 
 #[derive(Debug)]
 enum KeyModifier {
-    Shift, ShiftHyp, Alpha, RCL, Sto, Hyp
+    Shift, ShiftHyp, Alpha, Rcl, Sto, Hyp
 }
 
 impl Calculator {
@@ -160,8 +160,8 @@ impl Calculator {
 
             (Some(KeyModifier::Shift), Some(Key::Rcl), _, _) => self.modifier_key = Some(KeyModifier::Sto),
 
-            (Some(KeyModifier::RCL), Some(Key::Rcl), _, _) => self.modifier_key = None,
-            (_, Some(Key::Rcl), _, _) => self.modifier_key = Some(KeyModifier::RCL),
+            (Some(KeyModifier::Rcl), Some(Key::Rcl), _, _) => self.modifier_key = None,
+            (_, Some(Key::Rcl), _, _) => self.modifier_key = Some(KeyModifier::Rcl),
 
             (_, Some(Key::Left) , Some((menu, page)), _) => self.menu.as_mut().unwrap().1 = page.checked_sub(1).unwrap_or(menu.pages()-1),
             (_, Some(Key::Right), Some((menu, page)), _) => self.menu.as_mut().unwrap().1 = (page+1) % menu.pages(),
@@ -249,7 +249,7 @@ impl KeyModifier {
             //          "SAhMSR"
             Shift    => "S     ",
             Alpha    => " A    ",
-            RCL      => "     R",
+            Rcl      => "     R",
             Sto      => "    S ",
             ShiftHyp => "S h   ",
             Hyp      => "  h   ",

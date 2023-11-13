@@ -1,5 +1,6 @@
 #![feature(int_roundings)]
 #![allow(invalid_reference_casting)]
+#![warn(clippy::pedantic)]
 
 use std::{io::{Write, stdout}, time::*};
 use crossterm::{*, style::{Color, Stylize}, event::*};
