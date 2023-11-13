@@ -65,10 +65,10 @@ impl Calculator {
         use crossterm::event::*;
 
         macro_rules! key_map {
-            ($($($state: pat_param, $og: pat_param)|+ => $k: expr), * $(,)?) => {
+            ($($($og: pat_param)|+ => $k: expr), * $(,)?) => {
                 match ke {
                     $(
-                        $(Some(KeyEvent { code: $og, kind: KeyEventKind::Press, state: $state, .. }))|+ => {
+                        $(Some(KeyEvent { code: $og, kind: KeyEventKind::Press, .. }))|+ => {
                             self.pending_key = Some($k)
                         },
                     )*
@@ -78,60 +78,60 @@ impl Calculator {
         }
 
         key_map!(
-            _, KeyCode::Char('l')  | KeyEventState::KEYPAD, KeyCode::Char('+') => Key::Add,
-            _, KeyCode::Char(';')  | KeyEventState::KEYPAD, KeyCode::Char('-') => Key::Subtract,
-            _, KeyCode::Char('\'') | KeyEventState::KEYPAD, KeyCode::Char('*') => Key::Multiply,
+            KeyCode::Char('l') => Key::Add,
+            KeyCode::Char('-') => Key::Subtract,
+            KeyCode::Char(';') => Key::Multiply,
 
-            _, KeyCode::Char('`') => Key::Shift,
-            _, KeyCode::Char('0') => Key::_0,
-            _, KeyCode::Char('1') => Key::_1,
-            _, KeyCode::Char('2') => Key::_2,
-            _, KeyCode::Char('3') => Key::_3,
-            _, KeyCode::Char('4') => Key::_4,
-            _, KeyCode::Char('5') => Key::_5,
-            _, KeyCode::Char('6') => Key::_6,
-            _, KeyCode::Char('7') => Key::_7,
-            _, KeyCode::Char('8') => Key::_8,
-            _, KeyCode::Char('9') => Key::_9,
-            _, KeyCode::Char('-') => Key::Alpha,
-            _, KeyCode::Enter     => Key::Exe,
-            _, KeyCode::Backspace => Key::Del,
+            KeyCode::Char('`') => Key::Shift,
+            KeyCode::Char('0') => Key::_0,
+            KeyCode::Char('1') => Key::_1,
+            KeyCode::Char('2') => Key::_2,
+            KeyCode::Char('3') => Key::_3,
+            KeyCode::Char('4') => Key::_4,
+            KeyCode::Char('5') => Key::_5,
+            KeyCode::Char('6') => Key::_6,
+            KeyCode::Char('7') => Key::_7,
+            KeyCode::Char('8') => Key::_8,
+            KeyCode::Char('9') => Key::_9,
+            KeyCode::Char('=') => Key::Alpha,
+            KeyCode::Enter     => Key::Exe,
+            KeyCode::Backspace => Key::Del,
 
-            _, KeyCode::Char('q') => Key::Prog,
-            _, KeyCode::Char('w') => Key::Fmla,
-            _, KeyCode::Char('t') => Key::PowNegOne,
-            _, KeyCode::Char('y') => Key::Cubed,
-            _, KeyCode::Char('u') => Key::Rcl,
-            _, KeyCode::Char('i') => Key::Eng,
-            _, KeyCode::Char('o') => Key::BracketStart,
-            _, KeyCode::Char('p') => Key::BracketEnd,
-            _, KeyCode::Char('[') => Key::Comma,
-            _, KeyCode::Char(']') => Key::MPlus,
-            _, KeyCode::Char('\\') => Key::Mode,
+            KeyCode::Char('q') => Key::Prog,
+            KeyCode::Char('w') => Key::Fmla,
+            KeyCode::Char('t') => Key::PowNegOne,
+            KeyCode::Char('y') => Key::Cubed,
+            KeyCode::Char('u') => Key::Rcl,
+            KeyCode::Char('i') => Key::Eng,
+            KeyCode::Char('o') => Key::BracketStart,
+            KeyCode::Char('p') => Key::BracketEnd,
+            KeyCode::Char('[') => Key::Comma,
+            KeyCode::Char(']') => Key::MPlus,
+            KeyCode::Char('\\') => Key::Mode,
 
-            _, KeyCode::Char('a') => Key::Fraction,
-            _, KeyCode::Char('s') => Key::SquareRoot,
-            _, KeyCode::Char('d') => Key::Squared,
-            _, KeyCode::Char('f') => Key::Power,
-            _, KeyCode::Char('g') => Key::Log,
-            _, KeyCode::Char('h') => Key::Ln,
-            _, KeyCode::Char('k') => Key::Ac,
+            KeyCode::Char('a') => Key::Fraction,
+            KeyCode::Char('s') => Key::SquareRoot,
+            KeyCode::Char('d') => Key::Squared,
+            KeyCode::Char('f') => Key::Power,
+            KeyCode::Char('g') => Key::Log,
+            KeyCode::Char('h') => Key::Ln,
+            KeyCode::Char('k') => Key::Ac,
 
-            _, KeyCode::Char('z') => Key::Negative,
-            _, KeyCode::Char('x') => Key::Base60,
-            _, KeyCode::Char('c') => Key::Hyp,
-            _, KeyCode::Char('v') => Key::Sin,
-            _, KeyCode::Char('b') => Key::Cos,
-            _, KeyCode::Char('n') => Key::Tan,
-            _, KeyCode::Char('m') => Key::Ans,
-            _, KeyCode::Char(',') => Key::Exp,
-            _, KeyCode::Char('.') => Key::Dot,
-            _, KeyCode::Char('/') => Key::Divide,
+            KeyCode::Char('z') => Key::Negative,
+            KeyCode::Char('x') => Key::Base60,
+            KeyCode::Char('c') => Key::Hyp,
+            KeyCode::Char('v') => Key::Sin,
+            KeyCode::Char('b') => Key::Cos,
+            KeyCode::Char('n') => Key::Tan,
+            KeyCode::Char('m') => Key::Ans,
+            KeyCode::Char(',') => Key::Exp,
+            KeyCode::Char('.') => Key::Dot,
+            KeyCode::Char('/') => Key::Divide,
 
-            _, KeyCode::Left  => Key::Left,
-            _, KeyCode::Down  => Key::Down,
-            _, KeyCode::Up    => Key::Up,
-            _, KeyCode::Right => Key::Right,
+            KeyCode::Left  => Key::Left,
+            KeyCode::Down  => Key::Down,
+            KeyCode::Up    => Key::Up,
+            KeyCode::Right => Key::Right,
         );
     }
 

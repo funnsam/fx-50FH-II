@@ -34,9 +34,9 @@ x² 			d
 log 		g
 ln 			h
 AC 			k
-+ 			l OR Numpad +
-- 			; OR Numpad -
-× 			' OR Numpad *
++ 			l
+- 			-
+× 			;
 EXE 		Enter
 
 (-) 		z
@@ -58,13 +58,13 @@ Right 		→
 
 QWERTY Keyboard layout
 ```
-SHIF _1__ _2__ _3__ _4__ _5__ _6__ _7__ _8__ _9__ _0__ ALPH ____ DEL_
+SHIF _1__ _2__ _3__ _4__ _5__ _6__ _7__ _8__ _9__ _0__ _-__ ALPH DEL_
 ____ Prog FMLA _←__ _↓__ x-¹_ _x³_ RCL_ ENG_ _(__ _)__ _,__ _M+_ MODE
-______ ab/c sqrt _x²_ _^__ log_ _ln_ ____ _AC_ _+__ _-__ _×__ __EXE__       _↑__
+______ ab/c sqrt _x²_ _^__ log_ _ln_ ____ _AC_ _+__ _×__ ____ __EXE__       _↑__
 _________  (-)_ °'" hyp_ sin_ cos_ tan_ _.__ EXP_ Ans_ _÷__ _________  _←__ _↓__ _→__
 ```
 
-Numpad (Numlock on)
+Numpad (Numlock on) (only supported on consoles which supports the kitty keyboard protocol)
 ```
 ____ _÷__ _×__ _-__
 _9__ _8__ _7__ _+__
