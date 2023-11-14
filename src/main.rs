@@ -1,6 +1,13 @@
 #![feature(int_roundings)]
-#![allow(invalid_reference_casting)]
-#![warn(clippy::pedantic)]
+#![warn(
+    clippy::complexity,
+    clippy::correctness,
+    clippy::perf,
+    clippy::nursery,
+    clippy::suspicious,
+    clippy::style,
+)]
+#![allow(clippy::semicolon_inside_block)]
 
 use std::{io::{Write, stdout}, time::*};
 use crossterm::{*, style::{Color, Stylize}, event::*};
@@ -53,10 +60,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             style::Print(stat),
 
-            cursor::MoveTo(0, 3),
-            style::PrintStyledContent(
-                top .with(Color::White)
-            ),
+            cursor::MoveTo(0, 3)
+        )?;
+
+        for i in top {
+            queue!(
+                stdout,
+
+                style::PrintStyledContent(
+                    i.as_styled().with(Color::White)
+                )
+            )?;
+        }
+
+        queue!(
+            stdout,
 
             cursor::MoveTo(0, 4),
             style::PrintStyledContent(

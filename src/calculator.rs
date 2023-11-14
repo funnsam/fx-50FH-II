@@ -1,3 +1,5 @@
+use crossterm::style::*;
+
 #[derive(Debug)]
 pub struct Calculator {
     mode: Mode,
@@ -47,8 +49,15 @@ enum KeyModifier {
     Shift, ShiftHyp, Alpha, Rcl, Sto, Hyp
 }
 
+pub struct DisplayBlock {
+    text: String,
+    bold: bool, italic: bool
+}
+
+type DisplayBlocks = Vec<DisplayBlock>;
+
 impl Calculator {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
             mode: Mode::Complex,
             menu: None,
@@ -172,17 +181,17 @@ impl Calculator {
             (_, Some(Key::Up)   , None, _) => self.cursor_at = 0,
             (_, Some(Key::Down) , None, _) => self.cursor_at = 10,
 
-            (None, Some(key), Some((menu, page)), _) => menu.on_menu_interaction(unsafe { &mut *(&*self as *const Calculator as *mut Calculator) }, *page, key),
+            (None, Some(_), Some(_), _) => self.on_menu_interaction(),
 
             (_, Some(_), _, _) => self.modifier_key = None,
             (_, None, _, _) => (),
         }
     }
 
-    pub fn get_display(&self) -> (String, String, String, Option<(usize, bool)>) {
+    pub fn get_display(&self) -> (String, DisplayBlocks, String, Option<(usize, bool)>) {
         let mut stat = String::new();
-        let mut top = String::new();
-        let mut bot = String::new();
+        let mut top  = DisplayBlocks::new();
+        let mut bot  = String::new();
         let mut cursor = None;
 
         stat += &format!(
@@ -192,29 +201,38 @@ impl Calculator {
             self.modifier_key.as_ref().map_or("      ", |a| a.status_name()),
             self.mode.status_name(),
             self.pending_key
-            );
+        );
 
         match &self.menu {
             Some((menu, page)) => {
                 let (items, fill) = menu.get_page(*page);
                 let items_len = items.len();
                 let scroll_arrows = menu.pages() > 1;
-                top += if scroll_arrows { "←" } else { " " };
+                top.push(DisplayBlock {
+                    text: if scroll_arrows { "←" } else { " " }.to_string(),
+                    bold: false, italic: false
+                });
                 bot += "  ";
 
                 for i in items {
-                    top += &" ".repeat(i.2);
-                    top += i.0;
+                    top.push(DisplayBlock { text: " ".repeat(i.2), bold: false, italic: false });
+                    top.push(DisplayBlock { text: i.0.to_string(), bold: false, italic: false });
                     bot += &i.1.to_string();
                     bot += &" ".repeat(16_usize.div_floor(items_len));
                 }
 
-                top += &" ".repeat(fill);
+                top.push(DisplayBlock { text: " ".repeat(fill), bold: false, italic: false });
                 bot += &" ".repeat(fill);
-                top += if scroll_arrows { "→" } else { " " };
+                top.push(DisplayBlock {
+                    text: if scroll_arrows { "→" } else { " " }.to_string(),
+                    bold: false, italic: false
+                });
             },
             None => {
-                top += " απσᴇ𝑒           ";
+                top.push(DisplayBlock {
+                    text: " eeeee           ".to_string(),
+                    bold: true, italic: true
+                });
                 bot += "               5.";
                 cursor = Some((self.cursor_at, self.insert_mode));
             },
@@ -222,10 +240,35 @@ impl Calculator {
 
         (stat, top, bot, cursor)
     }
+
+    pub fn on_menu_interaction(&mut self) {
+        macro_rules! map_menu {
+            ($($menu: ident page $page: pat, key $key:ident => $block: expr),* $(,)?) => {
+                match (&self.menu.as_ref().unwrap(), self.pending_key.as_ref().unwrap()) {
+                    $(
+                        ((Menu::$menu, $page), Key::$key) => { $block },
+                    )*
+                    (_, Key::Ac) => (),
+                    _ => return,
+                }
+            };
+        }
+
+        map_menu!(
+            ModeSelect page _, key _1 => self.mode = Mode::Computation,
+            ModeSelect page _, key _2 => self.mode = Mode::Complex,
+            ModeSelect page _, key _3 => self.mode = Mode::Base(Base::Decimal),
+            ModeSelect page _, key _4 => self.mode = Mode::SingleStat,
+            ModeSelect page _, key _5 => self.mode = Mode::PairedStat,
+            ModeSelect page _, key _6 => self.mode = Mode::Program,
+        );
+
+        self.menu = None;
+    }
 }
 
 impl Mode {
-    pub fn status_name(&self) -> &'static str {
+    pub const fn status_name(&self) -> &'static str {
         use self::Base::*;
         use Mode::*;
         match self {
@@ -243,7 +286,7 @@ impl Mode {
 }
 
 impl KeyModifier {
-    pub fn status_name(&self) -> &'static str {
+    pub const fn status_name(&self) -> &'static str {
         use KeyModifier::*;
         match self {
             //          "SAhMSR"
@@ -258,7 +301,7 @@ impl KeyModifier {
 }
 
 impl Menu {
-    pub fn pages(&self) -> usize {
+    pub const fn pages(&self) -> usize {
         use Menu::*;
         match self {
             ModeSelect => 2,
@@ -274,19 +317,14 @@ impl Menu {
             _ => unreachable!()
         }
     }
+}
 
-    pub fn on_menu_interaction(&self, calc: &mut Calculator, page: usize, key: &Key) {
-        match (self, page, key) {
-            (Menu::ModeSelect, _, Key::_1) => calc.mode = Mode::Computation,
-            (Menu::ModeSelect, _, Key::_2) => calc.mode = Mode::Complex,
-            (Menu::ModeSelect, _, Key::_3) => calc.mode = Mode::Base(Base::Decimal),
-            (Menu::ModeSelect, _, Key::_4) => calc.mode = Mode::SingleStat,
-            (Menu::ModeSelect, _, Key::_5) => calc.mode = Mode::PairedStat,
-            (Menu::ModeSelect, _, Key::_6) => calc.mode = Mode::Program,
-            _ => return,
-        }
-
-        calc.menu = None;
+impl DisplayBlock {
+    pub fn as_styled(&self) -> StyledContent<String> {
+        let mut c = self.text.clone().stylize();
+        if self.bold { c = c.bold(); }
+        if self.italic { c = c.italic(); }
+        c
     }
 }
 
