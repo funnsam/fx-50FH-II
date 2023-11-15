@@ -9,7 +9,9 @@ pub struct Calculator {
     modifier_key: Option<KeyModifier>,
 
     cursor_at: usize,
-    insert_mode: bool,
+    replace_mode: bool,
+
+    user_input: Vec<Token>,
 }
 
 #[derive(Debug)]
@@ -31,6 +33,8 @@ enum Base {
 enum Menu {
     ModeSelect
 }
+
+type MenuItem = (&'static str, usize, usize);
 
 #[derive(Debug)]
 enum Key {
@@ -54,19 +58,49 @@ pub struct DisplayBlock {
     bold: bool, italic: bool
 }
 
+macro_rules! display_block {
+    ($text: expr) => {
+        DisplayBlock {
+            text: $text.to_string(),
+            bold: false, italic: false
+        }
+    };
+    (b $text: expr) => {
+        DisplayBlock {
+            text: $text.to_string(),
+            bold: true, italic: false
+        }
+    };
+    (i $text: expr) => {
+        DisplayBlock {
+            text: $text.to_string(),
+            bold: false, italic: true
+        }
+    };
+
+    (b i $text: expr) => {
+        DisplayBlock {
+            text: $text.to_string(),
+            bold: true, italic: true
+        }
+    };
+}
+
 type DisplayBlocks = Vec<DisplayBlock>;
 
 impl Calculator {
-    pub const fn new() -> Self {
+    pub fn new() -> Self {
         Self {
-            mode: Mode::Complex,
+            mode: Mode::Computation,
             menu: None,
 
             pending_key: None,
             modifier_key: None,
 
             cursor_at: 0,
-            insert_mode: false,
+            replace_mode: false,
+
+            user_input: Vec::with_capacity(99),
         }
     }
 
@@ -87,10 +121,6 @@ impl Calculator {
         }
 
         key_map!(
-            KeyCode::Char('l') => Key::Add,
-            KeyCode::Char('-') => Key::Subtract,
-            KeyCode::Char(';') => Key::Multiply,
-
             KeyCode::Char('`') => Key::Shift,
             KeyCode::Char('0') => Key::_0,
             KeyCode::Char('1') => Key::_1,
@@ -102,19 +132,20 @@ impl Calculator {
             KeyCode::Char('7') => Key::_7,
             KeyCode::Char('8') => Key::_8,
             KeyCode::Char('9') => Key::_9,
+            KeyCode::Char('-') => Key::Subtract,
             KeyCode::Char('=') => Key::Alpha,
             KeyCode::Enter     => Key::Exe,
             KeyCode::Backspace => Key::Del,
 
             KeyCode::Char('q') => Key::Prog,
             KeyCode::Char('w') => Key::Fmla,
+            KeyCode::Char('e') => Key::Exp,
             KeyCode::Char('t') => Key::PowNegOne,
             KeyCode::Char('y') => Key::Cubed,
             KeyCode::Char('u') => Key::Rcl,
             KeyCode::Char('i') => Key::Eng,
             KeyCode::Char('o') => Key::BracketStart,
             KeyCode::Char('p') => Key::BracketEnd,
-            KeyCode::Char('[') => Key::Comma,
             KeyCode::Char(']') => Key::MPlus,
             KeyCode::Char('\\') => Key::Mode,
 
@@ -125,6 +156,8 @@ impl Calculator {
             KeyCode::Char('g') => Key::Log,
             KeyCode::Char('h') => Key::Ln,
             KeyCode::Char('k') => Key::Ac,
+            KeyCode::Char('l') => Key::Add,
+            KeyCode::Char(';') => Key::Multiply,
 
             KeyCode::Char('z') => Key::Negative,
             KeyCode::Char('x') => Key::Base60,
@@ -133,7 +166,7 @@ impl Calculator {
             KeyCode::Char('b') => Key::Cos,
             KeyCode::Char('n') => Key::Tan,
             KeyCode::Char('m') => Key::Ans,
-            KeyCode::Char(',') => Key::Exp,
+            KeyCode::Char(',') => Key::Comma,
             KeyCode::Char('.') => Key::Dot,
             KeyCode::Char('/') => Key::Divide,
 
@@ -175,17 +208,38 @@ impl Calculator {
             (_, Some(Key::Left) , Some((menu, page)), _) => self.menu.as_mut().unwrap().1 = page.checked_sub(1).unwrap_or(menu.pages()-1),
             (_, Some(Key::Right), Some((menu, page)), _) => self.menu.as_mut().unwrap().1 = (page+1) % menu.pages(),
 
-            // TODO: replace with the length
             (_, Some(Key::Left) , None, _) => self.cursor_at = self.cursor_at.saturating_sub(1),
-            (_, Some(Key::Right), None, _) => self.cursor_at = (self.cursor_at+1).min(10),
+            (_, Some(Key::Right), None, _) => self.cursor_at = (self.cursor_at+1).min(self.user_input.len()),
             (_, Some(Key::Up)   , None, _) => self.cursor_at = 0,
-            (_, Some(Key::Down) , None, _) => self.cursor_at = 10,
+            (_, Some(Key::Down) , None, _) => self.cursor_at = self.user_input.len(),
 
             (None, Some(_), Some(_), _) => self.on_menu_interaction(),
+
+            (None, Some(Key::Power), None, _) => self.insert(Token::Power),
+            (None, Some(Key::SquareRoot), None, _) => self.insert(Token::SquareRoot),
+            (Some(KeyModifier::Shift), Some(Key::Ln), None, _) => self.insert(Token::EPower),
+
+            (None, Some(Key::Del), None, _) => {
+                self.cursor_at = self.cursor_at.saturating_sub(1);
+
+                if self.user_input.len() > 0 {
+                    self.user_input.remove(self.cursor_at);
+                }
+            },
 
             (_, Some(_), _, _) => self.modifier_key = None,
             (_, None, _, _) => (),
         }
+    }
+
+    fn insert(&mut self, t: Token) {
+        if !self.replace_mode {
+            self.user_input.insert(self.cursor_at, t);
+            self.cursor_at += 1;
+        } else {
+            self.user_input[self.cursor_at] = t;
+        }
+        self.modifier_key = None;
     }
 
     pub fn get_display(&self) -> (String, DisplayBlocks, String, Option<(usize, bool)>) {
@@ -230,11 +284,23 @@ impl Calculator {
             },
             None => {
                 top.push(DisplayBlock {
-                    text: " eeeee           ".to_string(),
-                    bold: true, italic: true
+                    text: " ".to_string(),
+                    bold: false, italic: false
                 });
+
+                let mut cursor_acc = 0;
+                let mut cursor_position = 0;
+                for (i, el) in self.user_input.iter().enumerate() {
+                    let mut blocks = el.as_display_block();
+                    cursor_acc = blocks.iter().fold(cursor_acc, |acc, i| i.text.chars().count() + acc);
+                    top.append(&mut blocks);
+
+                    if self.cursor_at-1 == i {
+                        cursor_position = cursor_acc
+                    }
+                }
                 bot += "               5.";
-                cursor = Some((self.cursor_at, self.insert_mode));
+                cursor = Some((cursor_position, self.replace_mode));
             },
         }
 
@@ -243,10 +309,10 @@ impl Calculator {
 
     pub fn on_menu_interaction(&mut self) {
         macro_rules! map_menu {
-            ($($menu: ident page $page: pat, key $key:ident => $block: expr),* $(,)?) => {
+            ($($menu: ident page $page: pat, key $($key:ident)|+ => $block: expr),* $(,)?) => {
                 match (&self.menu.as_ref().unwrap(), self.pending_key.as_ref().unwrap()) {
                     $(
-                        ((Menu::$menu, $page), Key::$key) => { $block },
+                        ((Menu::$menu, $page), $(Key::$key)|+) => { $block },
                     )*
                     (_, Key::Ac) => (),
                     _ => return,
@@ -328,4 +394,19 @@ impl DisplayBlock {
     }
 }
 
-type MenuItem = (&'static str, usize, usize);
+#[derive(Debug)]
+enum Token {
+    Power, SquareRoot, EPower,
+}
+
+impl Token {
+    pub fn as_display_block(&self) -> Vec<DisplayBlock> {
+        use Token::*;
+        use display_block as d;
+        match self {
+            Power           => vec![d!("^(")],
+            SquareRoot      => vec![d!("√(")],
+            EPower          => vec![d!(i "e"), d!("^(")],
+        }
+    }
+}
