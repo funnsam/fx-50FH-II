@@ -29,7 +29,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     terminal::enable_raw_mode()?;
 
     queue!(stdout, style::PrintStyledContent(
-        "Virtual fx-50FH II    BSD-2-Patent"
+        "Virtual fx-50FH II    BSD-2-Clause-Patent"
             .italic()
             .with(Color::DarkGrey)
     ))?;

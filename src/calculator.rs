@@ -217,7 +217,25 @@ impl Calculator {
 
             (None, Some(Key::Power), None, _) => self.insert(Token::Power),
             (None, Some(Key::SquareRoot), None, _) => self.insert(Token::SquareRoot),
-            (Some(KeyModifier::Shift), Some(Key::Ln), None, _) => self.insert(Token::EPower),
+            (Some(KeyModifier::Shift | KeyModifier::ShiftHyp), Some(Key::Ln), None, _) => self.insert(Token::EPower),
+            (Some(KeyModifier::Alpha), Some(Key::Ln), None, _) => self.insert(Token::E),
+            (None, Some(Key::Fraction), None, _) => self.insert(Token::Fraction),
+            (None, Some(Key::_0), None, _) => self.insert(Token::_0),
+            (None, Some(Key::_1), None, _) => self.insert(Token::_1),
+            (None, Some(Key::_2), None, _) => self.insert(Token::_2),
+            (None, Some(Key::_3), None, _) => self.insert(Token::_3),
+            (None, Some(Key::_4), None, _) => self.insert(Token::_4),
+            (None, Some(Key::_5), None, _) => self.insert(Token::_5),
+            (None, Some(Key::_6), None, _) => self.insert(Token::_6),
+            (None, Some(Key::_7), None, _) => self.insert(Token::_7),
+            (None, Some(Key::_8), None, _) => self.insert(Token::_8),
+            (None, Some(Key::_9), None, _) => self.insert(Token::_9),
+            (None, Some(Key::Add), None, _) => self.insert(Token::Add),
+            (None, Some(Key::Subtract), None, _) => self.insert(Token::Subtract),
+            (None, Some(Key::Multiply), None, _) => self.insert(Token::Multiply),
+            (None, Some(Key::Divide), None, _) => self.insert(Token::Divide),
+            (None, Some(Key::Negative), None, _) => self.insert(Token::Negative),
+            (Some(KeyModifier::Shift | KeyModifier::ShiftHyp), Some(Key::Log), None, _) => self.insert(Token::_10Power),
 
             (None, Some(Key::Del), None, _) => {
                 self.cursor_at = self.cursor_at.saturating_sub(1);
@@ -299,7 +317,7 @@ impl Calculator {
                         cursor_position = cursor_acc
                     }
                 }
-                bot += "               5.";
+                bot += "            todo!";
                 cursor = Some((cursor_position, self.replace_mode));
             },
         }
@@ -321,12 +339,36 @@ impl Calculator {
         }
 
         map_menu!(
-            ModeSelect page _, key _1 => self.mode = Mode::Computation,
-            ModeSelect page _, key _2 => self.mode = Mode::Complex,
-            ModeSelect page _, key _3 => self.mode = Mode::Base(Base::Decimal),
-            ModeSelect page _, key _4 => self.mode = Mode::SingleStat,
-            ModeSelect page _, key _5 => self.mode = Mode::PairedStat,
-            ModeSelect page _, key _6 => self.mode = Mode::Program,
+            ModeSelect page _, key _1 => {
+                self.mode = Mode::Computation;
+                self.user_input.clear();
+                self.cursor_at = 0;
+            },
+            ModeSelect page _, key _2 => {
+                self.mode = Mode::Complex;
+                self.user_input.clear();
+                self.cursor_at = 0;
+            },
+            ModeSelect page _, key _3 => {
+                self.mode = Mode::Base(Base::Decimal);
+                self.user_input.clear();
+                self.cursor_at = 0;
+            },
+            ModeSelect page _, key _4 => {
+                self.mode = Mode::SingleStat;
+                self.user_input.clear();
+                self.cursor_at = 0;
+            },
+            ModeSelect page _, key _5 => {
+                self.mode = Mode::PairedStat;
+                self.user_input.clear();
+                self.cursor_at = 0;
+            },
+            ModeSelect page _, key _6 => {
+                self.mode = Mode::Program;
+                self.user_input.clear();
+                self.cursor_at = 0;
+            },
         );
 
         self.menu = None;
@@ -396,7 +438,10 @@ impl DisplayBlock {
 
 #[derive(Debug)]
 enum Token {
-    Power, SquareRoot, EPower,
+    Power, SquareRoot, EPower, E, Fraction,
+    _0, _1, _2, _3, _4, _5, _6, _7, _8, _9,
+    Add, Subtract, Multiply, Divide, Negative,
+    _10Power,
 }
 
 impl Token {
@@ -406,7 +451,25 @@ impl Token {
         match self {
             Power           => vec![d!("^(")],
             SquareRoot      => vec![d!("√(")],
-            EPower          => vec![d!(i "e"), d!("^(")],
+            E               => vec![d!(b i "e")],
+            EPower          => vec![d!(b i "e"), d!("^(")],
+            Fraction        => vec![d!("⅃")],
+            _0              => vec![d!("0")],
+            _1              => vec![d!("1")],
+            _2              => vec![d!("2")],
+            _3              => vec![d!("3")],
+            _4              => vec![d!("4")],
+            _5              => vec![d!("5")],
+            _6              => vec![d!("6")],
+            _7              => vec![d!("7")],
+            _8              => vec![d!("8")],
+            _9              => vec![d!("9")],
+            Add             => vec![d!("+")],
+            Subtract        => vec![d!("–")],
+            Multiply        => vec![d!("×")],
+            Divide          => vec![d!("÷")],
+            Negative        => vec![d!("╶")],
+            _10Power        => vec![d!("₁₀^(")],
         }
     }
 }
