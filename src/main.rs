@@ -7,7 +7,10 @@
     clippy::suspicious,
     clippy::style,
 )]
-#![allow(clippy::semicolon_inside_block)]
+#![allow(
+    clippy::semicolon_inside_block,
+    clippy::just_underscores_and_digits,
+)]
 
 use std::{io::{Write, stdout}, time::*};
 use crossterm::{*, style::{Color, Stylize}, event::*};

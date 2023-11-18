@@ -235,12 +235,12 @@ impl Calculator {
             (None, Some(Key::Multiply), None, _) => self.insert(Token::Multiply),
             (None, Some(Key::Divide), None, _) => self.insert(Token::Divide),
             (None, Some(Key::Negative), None, _) => self.insert(Token::Negative),
-            (Some(KeyModifier::Shift | KeyModifier::ShiftHyp), Some(Key::Log), None, _) => self.insert(Token::_10Power),
+            (Some(KeyModifier::Shift | KeyModifier::ShiftHyp), Some(Key::Log), None, _) => self.insert(Token::TenPower),
 
             (None, Some(Key::Del), None, _) => {
                 self.cursor_at = self.cursor_at.saturating_sub(1);
 
-                if self.user_input.len() > 0 {
+                if !self.user_input.is_empty() {
                     self.user_input.remove(self.cursor_at);
                 }
             },
@@ -441,7 +441,7 @@ enum Token {
     Power, SquareRoot, EPower, E, Fraction,
     _0, _1, _2, _3, _4, _5, _6, _7, _8, _9,
     Add, Subtract, Multiply, Divide, Negative,
-    _10Power,
+    TenPower,
 }
 
 impl Token {
@@ -469,7 +469,7 @@ impl Token {
             Multiply        => vec![d!("×")],
             Divide          => vec![d!("÷")],
             Negative        => vec![d!("╶")],
-            _10Power        => vec![d!("₁₀^(")],
+            TenPower        => vec![d!("⒑^(")],
         }
     }
 }

@@ -14,6 +14,7 @@ This project uses a lot of unicode characters. Make sure your font and console h
 	- [ ] Basic calculator with built-in floats
 	- [ ] Custom floats and using them
 	- [ ] Complex mode
+	- [ ] Base mode
 	- [ ] Statistic modes
 - [ ] Program mode
 	- [ ] Program mode menu
