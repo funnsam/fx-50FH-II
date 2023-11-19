@@ -1,16 +1,8 @@
 [package]
-name = "fx-50fh-ii"
+name = "fx-maths"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[profile.dev]
-overflow-checks = false
-
-[profile.release]
-overflow-checks = false
-
 [dependencies]
-crossterm = "0.27.0"
-fx-maths = { path = "fx-maths/" }
